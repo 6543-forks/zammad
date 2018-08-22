@@ -18,6 +18,7 @@ class App.UiElement.ticket_perform_action
     for groupKey, groupMeta of groups
       if !groupMeta.model || !App[groupMeta.model]
         elements["#{groupKey}.email"] = { name: 'email', display: 'Email' }
+        elements["#{groupKey}.webhook"] = { name: 'webhook', display: 'Webhook' }
       else
 
         for row in App[groupMeta.model].configure_attributes
@@ -164,6 +165,15 @@ class App.UiElement.ticket_perform_action
     if groupAndAttribute is 'notification.email'
       elementRow.find('.js-setAttribute').html('')
       @buildRecipientList(elementFull, elementRow, groupAndAttribute, elements, meta, attribute)
+    else if groupAndAttribute is 'notification.webhook'
+      elementRow.find('.js-setAttribute').html('')
+      name = "#{attribute.name}::notification.webhook"
+      notificationElement = $( App.view('generic/ticket_perform_action/notification_webhook')(
+        attribute: attribute
+        name: name
+        meta: meta || {}
+      ))
+      elementRow.find('.js-setNotification').html(notificationElement)
     else
       elementRow.find('.js-setNotification').html('')
       if !elementRow.find('.js-setAttribute div').get(0)
@@ -306,7 +316,7 @@ class App.UiElement.ticket_perform_action
 
   @buildRecipientList: (elementFull, elementRow, groupAndAttribute, elements, meta, attribute) ->
 
-    return if elementRow.find('.js-setNotification .js-body').get(0)
+    #return if elementRow.find('.js-setNotification .js-body').get(0)
 
     options =
       'article_last_sender': 'Article Last Sender'
