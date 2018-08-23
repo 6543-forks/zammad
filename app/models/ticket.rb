@@ -913,6 +913,31 @@ perform changes on ticket
 
   def perform_changes_notification(_key, value, perform_origin, article)
 
+    if value['endpoint']
+      logger.debug { "Performing webhook trigger for ticket #{self}" }
+      
+      objects = {
+        ticket: self,
+        article: article || articles.last
+      }
+
+      body = NotificationFactory::Mailer.template(
+        templateInline: value['body'],
+        locale: 'en-en',
+        objects: objects,
+        quote: true,
+      )
+
+      clnt = HTTPClient.new
+      headers = { 
+        'Content-Type' => value['content_type'],
+        'User-Agent': 'Zammad'
+      }
+      res = clnt.post(value['endpoint'], body, headers)
+
+      logger.debug("Got response code: #{res.code}")
+    end
+
     # value['recipient'] was a string in the past (single-select) so we convert it to array if needed
     value_recipient = value['recipient']
     if !value_recipient.is_a?(Array)
