@@ -2,14 +2,10 @@
   <div class="controls js-endpoint">
     <input type="text" name="<%= @name %>::endpoint" value="<%= @meta.endpoint %>" style="width: 100%;" placeholder="Endpoint">
   </div>
-  <div class="controls js-endpoint">
+  <div class="controls js-content_type">
     <input type="text" name="<%= @name %>::content_type" value="<%= @meta.content_type %>" style="width: 100%;" placeholder="Content Type" >
   </div>
   <div class="controls js-body">
-    <div class="richtext form-control">
-      <div contenteditable="true" data-name="<%= @name %>::body">
-        <%- @meta.body %>
-      </div>
-    </div>
+    <textarea rows=50 name="<%= @name %>::body"><%- @meta.body %></textarea>
   </div>
 </div>

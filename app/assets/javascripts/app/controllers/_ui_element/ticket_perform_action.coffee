@@ -167,13 +167,36 @@ class App.UiElement.ticket_perform_action
       @buildRecipientList(elementFull, elementRow, groupAndAttribute, elements, meta, attribute)
     else if groupAndAttribute is 'notification.webhook'
       elementRow.find('.js-setAttribute').html('')
-      name = "#{attribute.name}::notification.webhook"
-      notificationElement = $( App.view('generic/ticket_perform_action/notification_webhook')(
-        attribute: attribute
-        name: name
-        meta: meta || {}
-      ))
-      elementRow.find('.js-setNotification').html(notificationElement)
+      if !elementRow.find('.js-setNotification .js-endpoint').get(0)
+        name = "#{attribute.name}::notification.webhook"
+        notificationElement = $( App.view('generic/ticket_perform_action/notification_webhook')(
+          attribute: attribute
+          name: name
+          meta: meta || {}
+        ))
+
+        notificationElement.find('.js-body div[contenteditable="true"]').ce(
+          mode: 'richtext'
+          placeholder: 'message'
+          maxlength: 200000
+        )
+        new App.WidgetPlaceholder(
+          el: notificationElement.find('.js-body div[contenteditable="true"]').parent()
+          objects: [
+            {
+              prefix: 'ticket'
+              object: 'Ticket'
+              display: 'Ticket'
+            },
+            {
+              prefix: 'user'
+              object: 'User'
+              display: 'Current User'
+            },
+          ]
+        )
+        
+        elementRow.find('.js-setNotification').html(notificationElement)
     else
       elementRow.find('.js-setNotification').html('')
       if !elementRow.find('.js-setAttribute div').get(0)
@@ -315,8 +338,7 @@ class App.UiElement.ticket_perform_action
     elementRow.find('.js-value').removeClass('hide').html(item)
 
   @buildRecipientList: (elementFull, elementRow, groupAndAttribute, elements, meta, attribute) ->
-
-    #return if elementRow.find('.js-setNotification .js-body').get(0)
+    return if elementRow.find('.js-setNotification .js-subject').get(0)
 
     options =
       'article_last_sender': 'Article Last Sender'
