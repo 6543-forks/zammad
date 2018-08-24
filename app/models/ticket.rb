@@ -933,9 +933,32 @@ perform changes on ticket
         'Content-Type' => value['content_type'],
         'User-Agent': 'Zammad'
       }
-      res = clnt.post(value['endpoint'], body, headers)
 
-      logger.debug("Got response code: #{res.code}")
+      res_body = ""
+      begin
+        res = clnt.post(value['endpoint'], body, headers)
+        logger.debug("Got response code: #{res.code}")
+        res_body = res.body
+      rescue Exception => e
+        res_body = e.message
+      end
+
+      note_body = "<div title='Webhook Payload: #{body}'><b>Webhook Response</b><br>#{res_body}</div>"
+      params = {}
+      params[:sender_id] = Ticket::Article::Sender.lookup(name: 'System').id
+      params[:updated_by_id] = params[:sender_id]
+      params[:created_by_id] = params[:sender_id]
+      params[:type] = Ticket::Article::Type.lookup(name: "note")
+      params[:internal] = true
+      params[:body] = note_body
+      params[:from] = "Webhook"
+      params[:content_type] = "text/html"
+      params[:ticket_id] = self.id
+      params[:to] = "Users"
+      params[:origin_by_id] = 2
+      article = Ticket::Article.new(params)
+      article.save!
+
     end
 
     # value['recipient'] was a string in the past (single-select) so we convert it to array if needed
