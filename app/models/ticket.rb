@@ -915,7 +915,7 @@ perform changes on ticket
 
     if value['endpoint']
       logger.debug { "Performing webhook trigger for ticket #{self}" }
-      
+
       objects = {
         ticket: self,
         article: article || articles.last
@@ -929,17 +929,17 @@ perform changes on ticket
       )
 
       clnt = HTTPClient.new
-      headers = { 
+      headers = {
         'Content-Type' => value['content_type'],
         'User-Agent': 'Zammad'
       }
 
-      res_body = ""
+      res_body = ''
       begin
         res = clnt.post(value['endpoint'], body, headers)
         logger.debug("Got response code: #{res.code}")
         res_body = res.body
-      rescue Exception => e
+      rescue StandardError => e
         res_body = e.message
       end
 
@@ -948,13 +948,13 @@ perform changes on ticket
       params[:sender_id] = Ticket::Article::Sender.lookup(name: 'System').id
       params[:updated_by_id] = params[:sender_id]
       params[:created_by_id] = params[:sender_id]
-      params[:type] = Ticket::Article::Type.lookup(name: "note")
+      params[:type] = Ticket::Article::Type.lookup(name: 'note')
       params[:internal] = true
       params[:body] = note_body
-      params[:from] = "Webhook"
-      params[:content_type] = "text/html"
-      params[:ticket_id] = self.id
-      params[:to] = "Users"
+      params[:from] = 'Webhook'
+      params[:content_type] = 'text/html'
+      params[:ticket_id] = id
+      params[:to] = 'Users'
       params[:origin_by_id] = 2
       article = Ticket::Article.new(params)
       article.save!
